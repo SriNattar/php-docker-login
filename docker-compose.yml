@@ -1,0 +1,16 @@
+version: '3.8'
+services:
+  web:
+    image: srinattar/php-login-app:1.0
+    ports:
+      - "8080:80"
+    depends_on:
+      - db
+
+  db:
+    image: mysql:8
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: testdb
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
