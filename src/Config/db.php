@@ -1,5 +1,5 @@
 <?php
-// Load DB configuration from environment variables for security and flexibility.
+// Database connection (configuration via environment variables)
 $host = getenv('DB_HOST') ?: 'localhost';
 $db   = getenv('DB_NAME') ?: 'php_login_db';
 $user = getenv('DB_USER') ?: 'postgres';
@@ -15,7 +15,6 @@ try {
         PDO::ATTR_EMULATE_PREPARES => false,
     ]);
 } catch (PDOException $e) {
-    // Don't expose DB details to users; log the error for debugging.
     error_log('DB Connection failed: ' . $e->getMessage());
     http_response_code(500);
     echo 'Internal Server Error';
