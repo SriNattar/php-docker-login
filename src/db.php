@@ -1,12 +1,24 @@
 <?php
-$host = "db";          // IMPORTANT: docker-compose service name
-$user = "root";
-$pass = "root";
-$db   = "testdb";
+// Load DB configuration from environment variables for security and flexibility.
+$host = getenv('DB_HOST') ?: 'localhost';
+$db   = getenv('DB_NAME') ?: 'php_login_db';
+$user = getenv('DB_USER') ?: 'postgres';
+$pass = getenv('DB_PASS') ?: '';
+$port = getenv('DB_PORT') ?: '5432';
+$sslmode = getenv('DB_SSLMODE') ?: 'disable';
 
-$conn = new mysqli($host, $user, $pass, $db);
+$dsn = "pgsql:host={$host};port={$port};dbname={$db};sslmode={$sslmode}";
 
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
+try {
+    $conn = new PDO($dsn, $user, $pass, [
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_EMULATE_PREPARES => false,
+    ]);
+} catch (PDOException $e) {
+    // Don't expose DB details to users; log the error for debugging.
+    error_log('DB Connection failed: ' . $e->getMessage());
+    http_response_code(500);
+    echo 'Internal Server Error';
+    exit;
 }
 ?>
